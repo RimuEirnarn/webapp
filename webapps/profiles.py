@@ -11,7 +11,7 @@ from io import StringIO
 CONFIG_DIR = (Path("~/.config/rimueirnarn.webapps") if system() == 'Linux' else Path("~/.rimueirnarn.webapps")).expanduser()
 CONFIG_FILE = CONFIG_DIR / "config.conf"
 PROFILE_DIR = CONFIG_DIR / "profiles"
-_PROFILE = ConfigParser()
+_PROFILE = ConfigParser(interpolation=None)
 _PROFILE.read(CONFIG_FILE)
 
 if not CONFIG_DIR.exists():
@@ -98,7 +98,7 @@ def _dstring(ns: dict[Any, Any]):
 
 def _dset(section: str, ns: dict[str, Any]):
     for k, v in ns.items():
-        print(f"[{section} {type(section)}] {k!r} -> {v!r}")
+        #print(f"[{section} {type(section)}] {k!r} -> {v!r}")
         if v in (None, False):
             _PROFILE.set(section, k, 'no')
             continue
