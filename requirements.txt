@@ -1,2 +1,5 @@
 pywebview
 argh
+requests
+tqdm
+sqlite-database

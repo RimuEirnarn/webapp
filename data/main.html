@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Webapp - Profile Manager</title>
+    <link rel="stylesheet" href="main.css">
+    <link rel="stylesheet" href="vendor/bootstrap-5.3.3-dist/css/bootstrap.min.css">
+    <link rel="stylesheet" href="vendor/bootstrap-icons-1.11.3/font/bootstrap-icons.min.css">
+    <script src="vendor/bootstrap-5.3.3-dist/js/bootstrap.bundle.min.js" defer></script>
+    <script src="vendor/bootstrap-5.3.3-dist/js/bootstrap.min.js" defer></script>
+    <script src="vendor/jquery.js" defer></script>
+    <script src="error.js" defer></script>
+    <script src="init.mjs" type="module" defer></script>
+    <script src="main.mjs" type="module" defer></script>
+</head>
+
+<body>
+    <div id="app">
+        <div class="d-flex justify-content-center dv-100">
+            <div class="mb-auto mt-auto text-center">
+                <div class="spinner-border mb-2" role="status">
+                    <span class="visually-hidden">Loading...</span>
+                </div>
+                <p id="system-log">System initialization...</p>
+            </div>
+        </div>
+    </div>
+    <div id="error"></div>
+</body>
+
+</html>

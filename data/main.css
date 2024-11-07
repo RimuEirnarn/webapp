@@ -1,0 +1,8 @@
+.subtitle {
+    font-size: small;
+}
+
+html, body, .dv-100 {
+    min-height: 100dvh;
+    min-width: 100dvw;
+}
