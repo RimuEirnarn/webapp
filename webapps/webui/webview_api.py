@@ -6,6 +6,7 @@ from ..profiles import PROFILE_DIR, Profile, SELF
 
 PROCESSES: list[Popen] = []
 
+
 @register
 def unloading():
     """Unloading"""
@@ -51,11 +52,10 @@ class WebviewAPI:
         print("Executing", name)
         # pylint: disable=consider-using-with
         proc = Popen(
-            ["python", SELF, "run", name, '--private'],
+            ["python", SELF, "run", name, "--private"],
             start_new_session=True,
             stdout=DEVNULL,
             stderr=STDOUT,
         )
         PROCESSES.append(proc)
         return True
-

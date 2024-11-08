@@ -115,9 +115,6 @@ let system;
 /** @type {Template} */
 let alert_tmpl;
 
-/** @type {String[]} */
-let illegal_names;
-
 const DEFAULT_THEME = "dark";
 
 console.log("Initiating the system");
@@ -152,8 +149,6 @@ async function post_pywebview_init() {
   const theme = await system.config.get("theme");
   if (theme !== DEFAULT_THEME)
     document.querySelector("html").setAttribute("data-bs-theme", theme);
-  setLog("Populating forbidden entries")
-  
 }
 
 try {
