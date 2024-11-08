@@ -19,12 +19,16 @@ def create_profile(name: str, url: str, title: str | None = None):
     print("Profile created")
 
 @arg("name", help="Name of the profile")
-def run(name: str):
+@arg('-p', '--private', help="Open the profile in private? This omit private configuration")
+def run(name: str, private: bool = False):
     """Execute from profile"""
     profile = Profile.load(name)
     data = annihilate_defconst(profile.data._asdict())
     start = annihilate_defconst(profile.start_data._asdict())
     settings = annihilate_defconst(profile.common_config._asdict())
+    if private:
+        data['title'] += " (Private Mode)"
+        start['private_mode'] = True
     if profile.data.url in (None, ''):
         print(f"Please change URL entry for {name} at {PROFILE_DIR / name / 'config.conf'}")
         return

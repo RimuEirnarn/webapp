@@ -13,6 +13,12 @@ const ACTIONS = {
     setLog(`Executing ${profile_name}`)
     await system.webview.execute(profile_name);
   },
+
+  async private_exec(profile_name) {
+    setLog(`Executing ${profile_name}`)
+    await system.webview.pexec(profile_name)
+  },
+
   async edit(profile_name) {
     CONFIG_STATE.profile_name = profile_name;
     console.log(`Attempt to access /config, profile name is ${profile_name}`);
