@@ -1,7 +1,7 @@
 import { INIT_STATE, system, setLog } from "./init.mjs";
 import { Template } from "./vendor/enigmarimu.js/template.mjs";
 import { config } from "./vendor/enigmarimu.js/config.mjs";
-import { setup, goto, page_dm } from "./vendor/enigmarimu.js/pages.mjs";
+import { setup, goto } from "./vendor/enigmarimu.js/pages.mjs";
 import { ValueError } from "./errors.mjs";
 
 const CONFIG_STATE = {
