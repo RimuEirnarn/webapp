@@ -1,5 +1,6 @@
 """Webview API"""
 
+import logging
 from subprocess import Popen, DEVNULL, STDOUT
 from atexit import register
 from ..profiles import PROFILE_DIR, Profile, SELF
@@ -19,7 +20,7 @@ class WebviewAPI:
 
     def profile_list(self):
         """Profile list"""
-        print("profile list")
+        logging.debug("profile list")
         profiles = (
             {"name": path.name, "path": str(path), **Profile.load_return(path.name)}
             for path in (a for a in PROFILE_DIR.iterdir() if a.is_dir())
@@ -28,7 +29,7 @@ class WebviewAPI:
 
     def fetch_profile(self, name):
         """Fetch profile"""
-        print("fetch profile")
+        logging.debug("fetch profile")
         profile = {"name": name, "path": str(PROFILE_DIR / name)}
         profile_data = Profile.load_return(name)
         profile.update(profile_data)
@@ -36,7 +37,7 @@ class WebviewAPI:
 
     def execute(self, name):
         """Execute a profile"""
-        print("Executing", name)
+        logging.debug("Executing %s", name)
         # pylint: disable=consider-using-with
         proc = Popen(
             ["python", SELF, "run", name],
@@ -49,7 +50,7 @@ class WebviewAPI:
 
     def pexec(self, name):
         """Execute a profile"""
-        print("Executing", name)
+        logging.debug("Executing %s", name)
         # pylint: disable=consider-using-with
         proc = Popen(
             ["python", SELF, "run", name, "--private"],

@@ -3,3 +3,4 @@ argh
 requests
 tqdm
 sqlite-database
+pyyaml

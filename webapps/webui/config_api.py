@@ -1,6 +1,7 @@
 # pylint: disable=protected-access
 
 """Config API"""
+import logging
 from sqlite3 import OperationalError
 from json import loads, dumps
 from typing import Any
@@ -32,7 +33,7 @@ class ConfigAPI:
 
     def get(self, name: str):
         """Return data from value"""
-        print("Get ->", name, flush=True)
+        logging.debug("Get -> %s", name)
         data = self._config.select_one({'name': name})
         if len(data) == 0:
             raise KeyError(name)
@@ -41,7 +42,7 @@ class ConfigAPI:
     def set(self, name: str, value: Any):
         """Set data to config store"""
         parsed = dumps(value)
-        print("Set ->", name, flush=True)
+        logging.debug("Set -> %s", name)
         if self.exists({'name': name}):
             self._config.update_one({'name': name}, {'value': parsed})
             self._config._sql.commit()
@@ -51,15 +52,14 @@ class ConfigAPI:
 
     def set_if_not_exists(self, name: str, value: Any):
         """Set data to config store IF not exists"""
-        print("Set IF NOT EXISTS ->", name, flush=True)
-        print(self.exists({'name': name}))
+        logging.debug("Set IF NOT EXISTS -> %s", name)
         if not self.exists({'name': name}):
             self._config.insert({'name': name, 'value': dumps(value)})
         self._config._sql.commit()
 
     def delete(self, name: str):
         """Delete a data from config store"""
-        print("Delete ->", name, flush=True)
+        logging.debug("Delete -> %s", name)
         try:
             return self._config.delete_one({'name': name})
         except OperationalError:

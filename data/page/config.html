@@ -1,4 +1,51 @@
 <button class="btn btn-outline-secondary" data-action="back"><i class="bi bi-arrow-left"></i></button>
-<div>
-    
+<div class="container">
+  <form>
+    <div class="mb-3">
+      <label for="title-input" class="form-label">Title</label>
+      <input type="text" class="form-control" id="title-input" placeholder="App name" data-bind="app/title">
+    </div>
+
+    <div class="mb-3">
+      <label for="url-input" class="form-label">Application URL</label>
+      <input type="text" class="form-control" id="url-input" placeholder="App URL" data-bind="app/url">
+    </div>
+
+    <div class="input-group mb-3">
+      <span class="input-group-text">App width and height</span>
+      <input type="number" aria-label="width" class="form-control" data-bind="app/width">
+      <input type="number" aria-label="height" class="form-control" data-bind="app/height">
+    </div>
+
+    <div class="mb-3">
+      <label for="background-color-input" class="form-label">Application URL</label>
+      <input type="text" class="form-control" id="background-color-input" placeholder="App URL"
+        data-bind="app/background_color">
+    </div>
+
+      <div class="form-check form-switch">
+        <input class="form-check-input" type="checkbox" role="switch" id="resizable-input" data-bind="app/resizable">
+        <label class="form-check-label" for="resizable-input">Resizable</label>
+      </div>
+      <div class="form-check form-switch">
+        <input class="form-check-input" type="checkbox" role="switch" id="fullscreen-input" data-bind="app/fullscreen">
+        <label class="form-check-label" for="fullscreen-input">Fullscreen</label>
+      </div>
+      <div class="form-check form-switch">
+        <input class="form-check-input" type="checkbox" role="switch" id="hidden-input" data-bind="app/hidden">
+        <label class="form-check-label" for="hidden-input">Hidden at startup</label>
+      </div>
+      <div class="form-check form-switch">
+        <input class="form-check-input" type="checkbox" role="switch" id="frameless-input" data-bind="app/frameless">
+        <label class="form-check-label" for="frameless-input">Frameless</label>
+      </div>
+      <div class="form-check form-switch">
+        <input class="form-check-input" type="checkbox" role="switch" id="easy-drag-input" data-bind="app/easy_drag">
+        <label class="form-check-label" for="easy-drag-input">Easy drag</label>
+      </div>
+      <div class="form-check form-switch">
+        <input class="form-check-input" type="checkbox" role="switch" id="minimized-input" data-bind="app/minimized">
+        <label class="form-check-label" for="minimized-input">Start at minimized</label>
+      </div>
+  </form>
 </div>

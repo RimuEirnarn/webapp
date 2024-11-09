@@ -3,6 +3,9 @@ import webview
 from webapps.profiles import Profile, annihilate_defconst, PROFILE_DIR
 from webapps.webui import api
 from webapps.webui.dependency import install_webui_dependency
+from webapps.webui.logs import setup_logging
+
+setup_logging()
 
 #@arg("link", help="Link or name")
 #def main(link: str):
