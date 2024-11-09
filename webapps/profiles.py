@@ -47,7 +47,7 @@ default = object()
 _DELOBJS_CW = ["js_api", "server", "server_args", "localization"]
 _DELOBJS_S = ["func", "server", "server_args", "menu"]
 _STR_DEFKEY = "py:default"
-_DELOBJS_API = ['html']
+_DELOBJS_API = ['html', 'http_server', 'http_port', 'storage_path', 'ssl', 'args']
 
 class CWConfig(NamedTuple):
     """Create Window Config"""
@@ -182,7 +182,7 @@ class Profile:
         self._start_data = StartConfig(private_mode=False, storage_path=str(self._dir))
         self.common_config = WebviewSetting()
         self._dir.mkdir(exist_ok=True)
-        self._custom_exec = self._dir / f"app.{'bat' if os.name == 'nt' else 'sh'}"
+        self._custom_exec = self._dir / f"{name}.{'bat' if os.name == 'nt' else 'sh'}"
         self._profile = ConfigParser(interpolation=None)
 
     @property

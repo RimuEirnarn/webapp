@@ -8,22 +8,66 @@ const CONFIG_STATE = {
   profile_name: null,
 };
 
+/** Function to gather data from the form into an object
+ * @returns {Profile}
+ */
+function collectFormData() {
+  const formData = {};
+
+  document.querySelectorAll("[data-bind]").forEach((element) => {
+    const bindPath = element.getAttribute("data-bind").split("/");
+    let current = formData;
+
+    // Traverse the object and create nested structure as needed
+    for (let i = 0; i < bindPath.length; i++) {
+      const key = bindPath[i];
+      if (i === bindPath.length - 1) {
+        // Set the value at the final key
+        current[key] =
+          element.type === "checkbox" ? element.checked : element.value;
+      } else {
+        // Create nested objects if they don't exist
+        current[key] = current[key] || {};
+        current = current[key];
+      }
+    }
+  });
+
+  return formData;
+}
+
 const ACTIONS = {
   async exec(profile_name) {
-    setLog(`Executing ${profile_name}`)
+    setLog(`Executing ${profile_name}`);
     await system.webview.execute(profile_name);
   },
 
   async private_exec(profile_name) {
-    setLog(`Executing ${profile_name}`)
-    await system.webview.pexec(profile_name)
+    setLog(`Executing ${profile_name}`);
+    await system.webview.pexec(profile_name);
   },
 
   async edit(profile_name) {
     CONFIG_STATE.profile_name = profile_name;
     console.log(`Attempt to access /config, profile name is ${profile_name}`);
-    await goto("/config", () => {
-      bound_buttons(document.querySelector('#app'))
+    await goto("/config", async () => {
+      bound_buttons(document.querySelector("#app"));
+      const profile = await system.webview.fetch_profile(profile_name);
+      console.log(profile);
+      bindForm(profile);
+      // Handle form submission
+      document
+        .querySelector("form")
+        .addEventListener("submit", async function (event) {
+          event.preventDefault(); // Prevent the default form submission
+
+          const profile_new = collectFormData(); // Gather form data into an object
+
+          profile_new.name = profile_name;
+          await system.webview.patch_profile(profile_new); // Call the save function
+          await goto("/");
+          return;
+        });
     });
   },
 
@@ -31,6 +75,28 @@ const ACTIONS = {
     await goto("/");
   },
 };
+
+function bindForm(data) {
+  document.querySelectorAll("[data-bind]").forEach((element) => {
+    const bindPath = element.getAttribute("data-bind").split("/");
+    let value = data;
+
+    // Traverse the object based on the bindPath array
+    for (const key of bindPath) {
+      if (value[key] === undefined) return; // Exit if path does not exist
+      value = value[key];
+    }
+
+    // Set value or checked state based on element type
+    if (element.type === "checkbox") {
+      element.checked = Boolean(value);
+    } else if (element.type === "number") {
+      element.value = Number(value);
+    } else {
+      element.value = value;
+    }
+  });
+}
 
 /**
  *
@@ -50,7 +116,7 @@ function bound_buttons(base) {
       console.warn(`No action found for "${action}"`);
     }
   });
-  setLog("Bound all tracable actions.")
+  setLog("Bound all tracable actions.");
 }
 
 async function renderProfileList() {
@@ -63,7 +129,7 @@ async function renderProfileList() {
           path: profile.path,
         }));
         template.batch_append("#lists", profileData);
-        bound_buttons(target)
+        bound_buttons(target);
 
         console.log("All profiles rendered and buttons bound.");
       });
@@ -89,12 +155,12 @@ async function main() {
       async init() {
         if (!CONFIG_STATE.profile_name)
           throw new ValueError("Selected profile is undefined");
-        const profile = await system.webview.fetch_profile(
-          CONFIG_STATE.profile_name
-        );
-        console.log(`Accessing /profile, current profile is...`);
-        console.log(profile);
-        return profile;
+        // const profile = await system.webview.fetch_profile(
+        //   CONFIG_STATE.profile_name
+        // );
+        // console.log(`Accessing /profile, current profile is...`);
+        // console.log(profile);
+        // return profile;
       },
     },
   });

@@ -19,8 +19,6 @@ import { Template } from "./vendor/enigmarimu.js/template.mjs";
  *
  * @property {string} title App title
  * @property {string?} url Application URL
- * @property {string?} html Application HTML code
- * @property {null} js_api Application JS API, always null
  * @property {number} width Application window width
  * @property {number} height Application window heigth
  * @property {number} x Application window x-pos
@@ -38,29 +36,16 @@ import { Template } from "./vendor/enigmarimu.js/template.mjs";
  * @property {boolean} text_select Will the user able to select?
  * @property {boolean} zoomable Is the app zoomable?
  * @property {boolean} draggable Is the app draggable?
- * @property {null} server App server
- * @property {null} server_args Server arguments
- * @property {object} localization App localization
  */
 
 /**
  * Webview Start Config
  * @typedef StartConfig
  * @type {object}
- * @prop {null} func Function
- * @prop {null} args Function arguments
- * @prop {object} localization App localization
  * @prop {string?} gui Webview Backend GUI
  * @prop {boolean} debug Debug
- * @prop {boolean} http_server HTTP Server
- * @prop {boolean} http_port HTTP Port
  * @prop {string} user_agent User Agent
  * @prop {boolean} private_mode Private Mode
- * @prop {string} storage_pat Storage Path
- * @prop {null} menu Menu
- * @prop {null} server Server
- * @prop {boolean} ssl SSL
- * @prop {null} server_args Server ARGS
  */
 
 /**
@@ -89,6 +74,8 @@ import { Template } from "./vendor/enigmarimu.js/template.mjs";
  * @prop {function(): Promise<Profile[]>} profile_list Returns an array of Profile
  * @prop {function(string): Promise<Profile>} fetch_profile Returns a specific Profile
  * @prop {function(string): Promise<null>} execute Execute a profile
+ * @prop {function(string): Promise<null>} pexec Private execute a profile
+ * @prop {function(Profile): Promise<boolean>} patch_profile Save profile configuration
  */
 
 /**

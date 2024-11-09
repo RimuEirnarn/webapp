@@ -3,7 +3,7 @@
 import logging
 from subprocess import Popen, DEVNULL, STDOUT
 from atexit import register
-from ..profiles import PROFILE_DIR, Profile, SELF
+from ..profiles import PROFILE_DIR, CWConfig, Profile, SELF, StartConfig, WebviewSetting
 
 PROCESSES: list[Popen] = []
 
@@ -59,4 +59,14 @@ class WebviewAPI:
             stderr=STDOUT,
         )
         PROCESSES.append(proc)
+        return True
+
+    def patch_profile(self, profile_data):
+        """Patch a profile"""
+        # pylint: disable=protected-access
+        profile = Profile(profile_data['name'], None)
+        profile._data = CWConfig(**profile_data['app'])
+        profile._start_data = StartConfig(**profile_data['start'])
+        profile.common_config = WebviewSetting(**profile_data['config'])
+        profile.save()
         return True

@@ -1,8 +1,20 @@
 .subtitle {
-    font-size: small;
+  font-size: small;
 }
 
-html, body, .dv-100 {
-    min-height: 100dvh;
-    min-width: 100dvw;
+html,
+body,
+.dv-100 {
+  min-height: 100dvh;
+  min-width: 100dvw;
+  -ms-overflow-style: none; /* Internet Explorer 10+ */
+  scrollbar-width: none; /* Firefox */
+}
+
+.config {
+  margin-bottom: 1.5rem;
+}
+
+::-webkit-scrollbar {
+  display: none;
 }
