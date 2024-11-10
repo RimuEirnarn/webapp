@@ -11,10 +11,10 @@ const CONFIG_STATE = {
 /** Function to gather data from the form into an object
  * @returns {Profile}
  */
-function collectFormData() {
+function collectFormData(base = document) {
   const formData = {};
 
-  document.querySelectorAll("[data-bind]").forEach((element) => {
+  base.querySelectorAll("[data-bind]").forEach((element) => {
     const bindPath = element.getAttribute("data-bind").split("/");
     let current = formData;
 
@@ -49,11 +49,11 @@ const ACTIONS = {
 
   async edit(profile_name) {
     CONFIG_STATE.profile_name = profile_name;
-    console.log(`Attempt to access /config, profile name is ${profile_name}`);
+    setLog(`Attempt to access /config, profile name is ${profile_name}`);
     await goto("/config", async () => {
       bound_buttons(document.querySelector("#app"));
       const profile = await system.webview.fetch_profile(profile_name);
-      console.log(profile);
+      // console.debug(profile);
       bindForm(profile);
       // Handle form submission
       document
@@ -71,13 +71,46 @@ const ACTIONS = {
     });
   },
 
+  async rename(profile_name) {
+    setLog("Attempt to rename a profile");
+    await renderRenameModal(profile_name);
+    // console.debug("Leaving leaving rename")
+  },
+
+  async push_back(modal_name) {
+    console.debug(`Pushing away: ${modal_name}`)
+    const modal = document.getElementById(modal_name);
+
+    if (modal) {
+      const bs_modal = new bootstrap.Modal(modal, {
+        backdrop: 'static'
+      })
+      // console.debug('hiding')
+      await bs_modal.dispose()
+    }
+    // console.debug("Leaving push_back")
+  },
+
+  async delete(name) {
+    console.debug('delete', name)
+  },
+
+  async submit(form_name) {
+    const form = document.querySelector(`#${form_name}`);
+    const formdata = collectFormData(form)
+    // console.debug(formdata)
+    const form_base = form.getAttribute('data-parent')
+    if (form_base)
+      await this.push_back(form_base)
+  },
+
   async back() {
     await goto("/");
   },
 };
 
-function bindForm(data) {
-  document.querySelectorAll("[data-bind]").forEach((element) => {
+function bindForm(data, base = document) {
+  base.querySelectorAll("[data-bind]").forEach((element) => {
     const bindPath = element.getAttribute("data-bind").split("/");
     let value = data;
 
@@ -103,15 +136,18 @@ function bindForm(data) {
  * @param {HTMLElement} base
  */
 function bound_buttons(base) {
-  const buttons = base.querySelectorAll("button[data-action]");
+  const buttons = base.querySelectorAll("[data-action]");
   buttons.forEach((button) => {
     const [action, profileName] = button.getAttribute("data-action").split(":");
+    const action_prevention = JSON.parse(button.getAttribute('data-action-prevent') || 'true')
+    // console.debug(`Action default prevention? ${action_prevention}`)
 
     if (ACTIONS[action]) {
-      button.addEventListener(
-        "click",
-        async () => await ACTIONS[action](profileName)
-      );
+      button.addEventListener("click", async (event) => {
+        if (action_prevention)
+          event.preventDefault();
+        await ACTIONS[action](profileName);
+      });
     } else {
       console.warn(`No action found for "${action}"`);
     }
@@ -120,7 +156,7 @@ function bound_buttons(base) {
 }
 
 async function renderProfileList() {
-  return Template.with_url("listing", "template/listing.html", 50, true).then(
+  return await Template.with_url("listing", "template/listing.html", 50, true).then(
     (template) => {
       system.webview.profile_list().then((profiles) => {
         const target = document.querySelector("#lists");
@@ -130,8 +166,29 @@ async function renderProfileList() {
         }));
         template.batch_append("#lists", profileData);
         bound_buttons(target);
+        // const dropdownElementList = document.querySelectorAll('.dropdown-toggle')
+        // const _ = [...dropdownElementList].map(dropdownToggleEl => new bootstrap.Dropdown(dropdownToggleEl))
 
         console.log("All profiles rendered and buttons bound.");
+      });
+    }
+  );
+}
+
+async function renderRenameModal(profile_name) {
+  return await Template.with_url("rename", "template/rename.html", 50, true).then(
+    async (template) => {
+      const target = document.querySelector("#modal-storage");
+      template.append("#modal-storage", {
+        profile_name: profile_name,
+      })
+      const rename_modal = new bootstrap.Modal(document.getElementById('rename-modal'), {backdrop: 'static'})
+      rename_modal.show()
+      bound_buttons(target);
+      bindForm({
+        rename: {
+          old: profile_name,
+        },
       });
     }
   );

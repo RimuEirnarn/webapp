@@ -1,0 +1,29 @@
+<div class="modal fade" tabindex="-1" id="rename-modal" data-store="$[profile_name]">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title">Rename Profile</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"
+          data-action="push_back:rename-modal" data-action-prevent="false"></button>
+      </div>
+      <div class="modal-body">
+        <p>What is the new profile name?</p>
+        <div id="rename-form" data-parent="rename-modal">
+          <div class="mb-3">
+            <label for="old-profile" class="form-label">Old profile</label>
+            <input type="email" class="form-control" id="old-profile" placeholder="Profile name" disabled data-bind="rename/old">
+          </div>
+          <div class="mb-3">
+            <label for="new-profile" class="form-label">New profile</label>
+            <input type="email" class="form-control" id="new-profile" placeholder="New profile name" required data-bind="rename/new">
+          </div>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal"
+          data-action="push_back:rename-modal" data-action-prevent="false">Close</button>
+        <button type="button" class="btn btn-primary" data-action="submit:rename-form" data-action-prevent="false" data-bs-dismiss="modal">Save changes</button>
+      </div>
+    </div>
+  </div>
+</div>

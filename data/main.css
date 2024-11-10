@@ -7,8 +7,8 @@ body,
 .dv-100 {
   min-height: 100dvh;
   min-width: 100dvw;
-  -ms-overflow-style: none; /* Internet Explorer 10+ */
-  scrollbar-width: none; /* Firefox */
+  -ms-overflow-style: none;
+  scrollbar-width: none;
 }
 
 .config {
@@ -17,4 +17,16 @@ body,
 
 ::-webkit-scrollbar {
   display: none;
+}
+
+.custom-dropdown-toggle::after {
+  display: none !important;
+}
+
+.custom-dropdown-toggle:focus, .custom-dropdown-toggle:focus-visible, .custom-dropdown-toggle:checked {
+  border: 0px;
+}
+
+#modal {
+  z-index: 2000;
 }

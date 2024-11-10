@@ -76,6 +76,10 @@ import { Template } from "./vendor/enigmarimu.js/template.mjs";
  * @prop {function(string): Promise<null>} execute Execute a profile
  * @prop {function(string): Promise<null>} pexec Private execute a profile
  * @prop {function(Profile): Promise<boolean>} patch_profile Save profile configuration
+ * @prop {function(string, string): Promise<null>} rename Rename a profile
+ * @prop {function(string, string): Promise<string>} shallow_copy Shallow copy a profile
+ * @prop {function(string, string): Promise<string>} deep_copy Deep copy a profile (this copies application data as well)
+ * @prop {function(string): Promise<null>} delete_profile Delete a profile
  */
 
 /**
