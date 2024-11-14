@@ -1,3 +1,4 @@
+// @ts-check
 import { INIT_STATE, system, setLog } from "./init.mjs";
 import { Template } from "./vendor/enigmarimu.js/template.mjs";
 import { config } from "./vendor/enigmarimu.js/config.mjs";
@@ -6,17 +7,24 @@ import { ValueError } from "./errors.mjs";
 /** @typedef {import('./types.mjs').Profile} Profile */
 
 const CONFIG_STATE = {
-  profile_name: null,
+  profile_name: '',
 };
 
 /** Function to gather data from the form into an object
+ * @param {Document | HTMLElement} [base=document] 
  * @returns {Profile}
  */
 function collectFormData(base = document) {
-  const formData = {};
+  const formData = {
+    name: '',
+    path: '',
+    app: {},
+    start: {},
+    config: {}
+  };
 
   base.querySelectorAll("[data-bind]").forEach((element) => {
-    const bindPath = element.getAttribute("data-bind").split("/");
+    const bindPath = (element.getAttribute("data-bind") || '').split("/");
     let current = formData;
 
     // Traverse the object and create nested structure as needed
@@ -25,6 +33,7 @@ function collectFormData(base = document) {
       if (i === bindPath.length - 1) {
         // Set the value at the final key
         current[key] =
+          // @ts-ignore
           element.type === "checkbox" ? element.checked : element.value;
       } else {
         // Create nested objects if they don't exist
@@ -34,29 +43,46 @@ function collectFormData(base = document) {
     }
   });
 
+  // @ts-ignore
   return formData;
 }
 
 const ACTIONS = {
+  /**
+   * Execute a profile
+   * @param {string} profile_name 
+   */
   async exec(profile_name) {
     setLog(`Executing ${profile_name}`);
     await system.webview.execute(profile_name);
   },
 
+  /**
+   * Private execute a profile
+   * @param {string} profile_name 
+   */
   async private_exec(profile_name) {
     setLog(`Executing ${profile_name}`);
     await system.webview.pexec(profile_name);
   },
 
+  /**
+   * @param {string} profile_name
+   */
   async edit(profile_name) {
+    if (profile_name === null)
+      throw new ValueError("Profile name must be defined")
+  
     CONFIG_STATE.profile_name = profile_name;
     setLog(`Attempt to access /config, profile name is ${profile_name}`);
     await goto("/config", async () => {
-      bound_buttons(document.querySelector("#app"));
+      bound_buttons(document.querySelector("#app") || document.body);
       const profile = await system.webview.fetch_profile(profile_name);
       // console.debug(profile);
+      // @ts-ignore
       bindForm(profile);
       // Handle form submission
+      // @ts-ignore
       document
         .querySelector("form")
         .addEventListener("submit", async function (event) {
@@ -78,11 +104,16 @@ const ACTIONS = {
     // console.debug("Leaving leaving rename")
   },
 
+  /**
+   * Push back
+   * @param {string} modal_name 
+   */
   async push_back(modal_name) {
     console.debug(`Pushing away: ${modal_name}`)
     const modal = document.getElementById(modal_name);
 
     if (modal) {
+      // @ts-ignore
       const bs_modal = new bootstrap.Modal(modal, {
         backdrop: 'static'
       })
@@ -92,11 +123,21 @@ const ACTIONS = {
     // console.debug("Leaving push_back")
   },
 
+  /**
+   * Delete
+   * @param {string} name 
+   */
   async delete(name) {
     console.debug('delete', name)
   },
 
+  /**
+   * Submit current form
+   * @param {string} form_name 
+   */
   async submit(form_name) {
+    /** @type {HTMLElement} */
+    // @ts-ignore
     const form = document.querySelector(`#${form_name}`);
     const formdata = collectFormData(form)
     // console.debug(formdata)
@@ -110,23 +151,34 @@ const ACTIONS = {
   },
 };
 
+/**
+ * Bind forms to form element
+ * @param {Object.<string, string>} data 
+ * @param {Document | HTMLElement} base 
+ */
 function bindForm(data, base = document) {
   base.querySelectorAll("[data-bind]").forEach((element) => {
-    const bindPath = element.getAttribute("data-bind").split("/");
+    const bindPath = (element.getAttribute("data-bind") || "").split("/");
     let value = data;
 
     // Traverse the object based on the bindPath array
     for (const key of bindPath) {
       if (value[key] === undefined) return; // Exit if path does not exist
+      // @ts-ignore
       value = value[key];
     }
 
     // Set value or checked state based on element type
+    // @ts-ignore
     if (element.type === "checkbox") {
+      // @ts-ignore
       element.checked = Boolean(value);
+    // @ts-ignore
     } else if (element.type === "number") {
+      // @ts-ignore
       element.value = Number(value);
     } else {
+      // @ts-ignore
       element.value = value;
     }
   });
@@ -134,12 +186,15 @@ function bindForm(data, base = document) {
 
 /**
  *
- * @param {HTMLElement} base
+ * @param {HTMLElement | Document | Element} base
  */
-function bound_buttons(base) {
+function bound_buttons(base = document) {
+  if (base === null) {
+    throw new ValueError("Base element must be defined. You probably forgot that the value used is not found.")
+  }
   const buttons = base.querySelectorAll("[data-action]");
   buttons.forEach((button) => {
-    const [action, profileName] = button.getAttribute("data-action").split(":");
+    const [action, profileName] = (button.getAttribute("data-action") || '').split(":");
     const action_prevention = JSON.parse(button.getAttribute('data-action-prevent') || 'true')
     // console.debug(`Action default prevention? ${action_prevention}`)
 
@@ -160,6 +215,8 @@ async function renderProfileList() {
   return await Template.with_url("listing", "template/listing.html", 50, true).then(
     (template) => {
       system.webview.profile_list().then((profiles) => {
+        /** @type {HTMLElement} */
+        // @ts-ignore
         const target = document.querySelector("#lists");
         const profileData = profiles.map((profile) => ({
           name: profile.name,
@@ -179,14 +236,18 @@ async function renderProfileList() {
 async function renderRenameModal(profile_name) {
   return await Template.with_url("rename", "template/rename.html", 50, true).then(
     async (template) => {
+      /** @type {HTMLElement} */
+      // @ts-ignore
       const target = document.querySelector("#modal-storage");
       template.append("#modal-storage", {
         profile_name: profile_name,
       })
+      // @ts-ignore
       const rename_modal = new bootstrap.Modal(document.getElementById('rename-modal'), {backdrop: 'static'})
       rename_modal.show()
       bound_buttons(target);
       bindForm({
+        // @ts-ignore
         rename: {
           old: profile_name,
         },
@@ -203,6 +264,7 @@ async function main() {
   setup({
     "/": {
       url: "page/index.html",
+      // @ts-ignore
       async init() {
         console.debug("Begin downloading and rendering templates");
         await renderProfileList();
@@ -210,6 +272,7 @@ async function main() {
     },
     "/config": {
       url: "page/config.html",
+      // @ts-ignore
       async init() {
         if (!CONFIG_STATE.profile_name)
           throw new ValueError("Selected profile is undefined");
