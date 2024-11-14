@@ -3,6 +3,7 @@ import { Template } from "./vendor/enigmarimu.js/template.mjs";
 import { config } from "./vendor/enigmarimu.js/config.mjs";
 import { setup, goto } from "./vendor/enigmarimu.js/pages.mjs";
 import { ValueError } from "./errors.mjs";
+/** @typedef {import('./types.mjs').Profile} Profile */
 
 const CONFIG_STATE = {
   profile_name: null,
