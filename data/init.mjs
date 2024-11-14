@@ -1,3 +1,4 @@
+// @ts-check
 import { Template } from "./vendor/enigmarimu.js/template.mjs";
 /** @typedef {import('./types.mjs').PyWebviewAPI} PyWebviewAPI */
 
@@ -16,14 +17,20 @@ const INIT_STATE = {
   mainjs_end: 0,
 };
 
+/**
+ * Set log
+ * @param {string} text 
+ */
 function setLog(text) {
   const syslog = document.querySelector("#system-log");
   console.log(`[SYSLOG] ${text}`);
   if (syslog)
+    // @ts-ignore
     syslog.innerText = text;
 }
 
 async function init() {
+  // @ts-ignore
   document.querySelector("html").setAttribute("data-bs-theme", DEFAULT_THEME);
   setLog("Downloading alert template");
   return Template.with_url("alert", "template/alert.html", 50);
@@ -39,6 +46,7 @@ async function post_pywebview_init() {
   /** @type {string} */
   const theme = await system.config.get("theme");
   if (theme !== DEFAULT_THEME)
+    // @ts-ignore
     document.querySelector("html").setAttribute("data-bs-theme", theme);
 }
 
@@ -53,6 +61,7 @@ try {
   system = await (async () => {
     return new Promise((resolve) => {
       setTimeout(resolve, 1000);
+    // @ts-ignore
     }).then(() => window.pywebview.api);
   })();
 
