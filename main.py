@@ -59,7 +59,7 @@ def load_missing(name):
 def webui():
     """Web UI"""
     install_webui_dependency()
-    webview.create_window("Webapp Profile UI Manager", 'data/main.html', js_api=api)
+    webview.create_window(api.app_name(), 'data/main.html', js_api=api)
     webview.start(debug=True)
 
 def webui_reinstall():

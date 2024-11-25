@@ -2,12 +2,12 @@
   <div class="modal-dialog modal-dialog-centered">
     <div class="modal-content">
       <div class="modal-header">
-        <h5 class="modal-title">Rename Profile</h5>
+        <h5 class="modal-title">$[title]</h5>
         <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"
           data-action="push_back:rename-modal" data-action-prevent="false"></button>
       </div>
       <div class="modal-body">
-        <p>What is the new profile name?</p>
+        <p>$[prompt]</p>
         <div id="rename-form" data-parent="rename-modal">
           <div class="mb-3">
             <label for="old-profile" class="form-label">Old profile</label>
@@ -22,7 +22,7 @@
       <div class="modal-footer">
         <button type="button" class="btn btn-secondary" data-bs-dismiss="modal"
           data-action="push_back:rename-modal" data-action-prevent="false">Close</button>
-        <button type="button" class="btn btn-primary" data-action="submit:rename-form" data-action-prevent="false" data-bs-dismiss="modal">Save changes</button>
+        <button type="button" class="btn btn-primary" data-action="$[action]:rename-form" data-action-prevent="false" data-bs-dismiss="modal">Save changes</button>
       </div>
     </div>
   </div>

@@ -1,12 +1,15 @@
 """Profile handler"""
 
+from urllib.parse import urlparse
 from pathlib import Path
 from platform import system
 from configparser import ConfigParser
 from typing import NamedTuple, Callable, Any
 from io import StringIO
-from sys import exit # pylint: disable=redefined-builtin
+from sys import exit  # pylint: disable=redefined-builtin
 import os
+
+from webapps.validation import Validation
 
 APP_BAT_TEMPLATE = """\
 @echo off
@@ -47,7 +50,14 @@ default = object()
 _DELOBJS_CW = ["js_api", "server", "server_args", "localization"]
 _DELOBJS_S = ["func", "server", "server_args", "menu"]
 _STR_DEFKEY = "py:default"
-_DELOBJS_API = ['html', 'http_server', 'http_port', 'storage_path', 'ssl', 'args']
+_DELOBJS_API = ["html", "http_server", "http_port", "storage_path", "ssl", "args"]
+
+def check(name):
+    if '/' in name:
+        return False
+    if '\\' in name:
+        return False
+    return True
 
 class CWConfig(NamedTuple):
     """Create Window Config"""
@@ -77,6 +87,56 @@ class CWConfig(NamedTuple):
     server_args: dict | Any = default
     localization: dict | None = None
 
+    def validate(self):
+        """Validate create-window configs"""
+        vl = Validation()
+        vl.set(isinstance(self.title, str), "app/title", "Title is not a string")
+        r = urlparse(self.url)
+        vl.set(
+            all((r.scheme, r.netloc)) and self.html is None,
+            "app/url",
+            "URL is malformed",
+        )
+        # HTML is optional
+        vl.set(isinstance(self.width, int), "app/width", "the width is not an integer")
+        vl.set(
+            isinstance(self.height, int),
+            "app/height",
+            "the height is not an integer",
+        )
+        vl.set(self.width > 0, "app/width", "width must not less than 0")
+        vl.set(self.height > 0, "app/height", "height must not less than 0")
+        # X, Y is optional
+        vl.set(
+            all(
+                map(
+                    lambda stuff: isinstance(stuff, bool),
+                    (
+                        self.resizable,
+                        self.fullscreen,
+                        self.hidden,
+                        self.frameless,
+                        self.easy_drag,
+                        self.minimized,
+                        self.on_top,
+                        self.confirm_close,
+                        self.transparent,
+                        self.text_select,
+                        self.zoomable,
+                        self.draggable,
+                    ),
+                )
+            ),
+            "app/bools",
+            "A value is detected to be non-boolean",
+        )
+        vl.set(
+            self.background_color[0] == "#" and len(self.background_color) == 7,
+            "app/background_color",
+            "Color format is invalid",
+        )
+        return vl
+
 
 class StartConfig(NamedTuple):
     """Start config"""
@@ -96,6 +156,21 @@ class StartConfig(NamedTuple):
     ssl: bool = False
     server_args: dict | Any = default
 
+    def validate(self):
+        """Validate start config"""
+        vl = Validation()
+        vl.set(
+            all(
+                map(
+                    lambda stuff: isinstance(stuff, bool),
+                    (self.debug, self.private_mode),
+                )
+            ),
+            "start/any",
+            "Either debug/private mode is not boolean",
+        )
+        return vl
+
 
 class WebviewSetting(NamedTuple):
     """Webview Setting"""
@@ -104,6 +179,10 @@ class WebviewSetting(NamedTuple):
     ALLOW_FILE_URLS: bool = True
     ALLOW_EXTERNAL_LINKS_IN_BROWSER: bool = True
     OPEN_DEVTOOL_IN_DEBUG: bool = True
+
+    def validate(self):
+        """Webview config validator"""
+        assert all(map(lambda stuff: isinstance(stuff, bool), self))
 
 
 def replace_default(ns: dict[str, Any], with_: Any):
@@ -115,7 +194,7 @@ def replace_default(ns: dict[str, Any], with_: Any):
     return copied
 
 
-def annihilate_defconst(ns: dict[str, Any], to_api: bool=False):
+def annihilate_defconst(ns: dict[str, Any], to_api: bool = False):
     """Delete any constant default"""
     copied = ns.copy()
     for k in ns.copy():
@@ -177,13 +256,22 @@ class Profile:
     def __init__(self, name: str, url: str, title: str = None):
         self._data = CWConfig(name or title, url=url)
         self._name = name
-        self._dir = PROFILE_DIR / name
-        self._config = self._dir / "config.conf"
         self._start_data = StartConfig(private_mode=False, storage_path=str(self._dir))
         self.common_config = WebviewSetting()
-        self._dir.mkdir(exist_ok=True)
-        self._custom_exec = self._dir / f"{name}.{'bat' if os.name == 'nt' else 'sh'}"
+        # self._dir.mkdir(exist_ok=True)
         self._profile = ConfigParser(interpolation=None)
+
+    @property
+    def _dir(self):
+        return PROFILE_DIR / self._name
+
+    @property
+    def _config(self):
+        return self._dir / "config.conf"
+
+    @property
+    def _custom_exec(self):
+        return self._dir / f"{self._name}.{'bat' if os.name == 'nt' else 'sh'}"
 
     @property
     def data(self):
@@ -197,6 +285,7 @@ class Profile:
 
     def save(self):
         """Save data to config file"""
+        self._dir.mkdir(exist_ok=True)
         name = self._name
         app = self._custom_exec
         sio = StringIO()
@@ -264,6 +353,10 @@ class Profile:
     def load_return(name: str):
         """Load return"""
         self = Profile.load(name)
+        return self.to_dict()
+
+    def to_dict(self):
+        """Return the instance into JSON-able"""
         return {
             "app": annihilate_defconst(self.data._asdict(), True),
             "start": annihilate_defconst(self.start_data._asdict(), True),
@@ -287,3 +380,21 @@ class Profile:
                     APP_SH_TEMPLATE.format(dir=SELF.parent, self=str(self), name=name)
                 )
         print(f"Refreshed {self._name}")
+
+    def validate(self):
+        """Validate this profile"""
+        vl = Validation()
+        # vl.set(False, "name", "test :3")
+        vl.set(
+            check(self._name),
+            "name",
+            "Profile name contains illegal character",
+        )
+        vl.set(len(self._name) > 0, "name", "Profile name must not be empty")
+        vl1 = self.data.validate()
+        vl2 = self.start_data.validate()
+        self.common_config.validate()
+        a0 = vl.to_json()
+        a0.extend(vl1.to_json())
+        a0.extend(vl2.to_json())
+        return a0

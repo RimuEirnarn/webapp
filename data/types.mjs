@@ -1,12 +1,23 @@
 /**
  * @typedef PyWebviewAPI API
  * @type {object}
- *
+ * 
+ * @prop {function(): Promise<string>} app_name Application Name
+ * @prop {function(): Promise<string>} short_name Application Short Name
  * @prop {OSAPI} os OS API
  * @prop {WebviewAPI} webview Webview API
  * @prop {ConfigAPI} config Config Store
  */
 
+
+/**
+ * @typedef ValidationEntry Validation Entry
+ * @type {object}
+ * 
+ * @prop {boolean} condition The condition that was passed in
+ * @prop {string} of The target data-bind
+ * @prop {string} message Reason of the validation entry
+ */
 
 /**
  * Profile
@@ -83,11 +94,15 @@
  * @prop {function(string): Promise<Profile>} fetch_profile Returns a specific Profile
  * @prop {function(string): Promise<null>} execute Execute a profile
  * @prop {function(string): Promise<null>} pexec Private execute a profile
- * @prop {function(Profile): Promise<boolean>} patch_profile Save profile configuration
+ * @prop {function(Profile): Promise<ValidationEntry[]>} patch_profile Save profile configuration
  * @prop {function(string, string): Promise<null>} rename Rename a profile
  * @prop {function(string, string): Promise<string>} shallow_copy Shallow copy a profile
  * @prop {function(string, string): Promise<string>} deep_copy Deep copy a profile (this copies application data as well)
  * @prop {function(string): Promise<null>} delete_profile Delete a profile
+ * @prop {function(Profile): Promise<ValidationEntry[]>} new_profile Save a new profile configuration
+ * @prop {function(Profile): Promise<ValidationEntry[]>} validate_profile Validate a profile state
+ * @prop {function(): Promise<Profile>} provide_default Returns a default Profile
+ * @prop {function(): Promise<never>} error just raise an exception
  */
 
 /**

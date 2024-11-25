@@ -161,3 +161,4 @@ cython_debug/
 
 data/vendor/*
 !data/vendor/README.md
+node_modules

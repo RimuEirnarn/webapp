@@ -29,7 +29,7 @@ function setLog(text) {
     syslog.innerText = text;
 }
 
-async function init() {
+async function init_alert() {
   // @ts-ignore
   document.querySelector("html").setAttribute("data-bs-theme", DEFAULT_THEME);
   setLog("Downloading alert template");
@@ -52,7 +52,7 @@ async function post_pywebview_init() {
 
 try {
   // Attempt to initialize system and wait for pywebview to be available
-  alert_tmpl = await init();
+  alert_tmpl = await init_alert();
 
   INIT_STATE.initjs_end = performance.now();
 
@@ -60,7 +60,7 @@ try {
   INIT_STATE.pywebview_start = performance.now();
   system = await (async () => {
     return new Promise((resolve) => {
-      setTimeout(resolve, 1000);
+      setTimeout(resolve, 10);
     // @ts-ignore
     }).then(() => window.pywebview.api);
   })();

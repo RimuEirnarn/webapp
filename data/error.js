@@ -55,3 +55,8 @@ window.onerror = (msg, source, lineno, colno, error) => {
         error: error
     }))
 }
+
+window.addEventListener('unhandledrejection', (event) => {
+  // console.error(`Unhandled rejection: ${event.reason}`)
+  window_onerror({error: "Promise rejection", message: event.reason, filename: 'SOMEWHERE', lineno: 0, colno: 0})
+})

@@ -1,33 +1,64 @@
 <div class="container mt-2 mb-2">
   <button class="btn btn-outline-secondary mb-2" data-action="back"><i class="bi bi-arrow-left"></i></button>
-  <form>
+  <form class="needs-validation" novalidate>
+    <div class="mb-3" data-visibility="$[state]" data-id="system-name" data-init
+      data-init-visibility="compute?attribute:this/data-visibility==false">
+      <h3>System Configuration</h3>
+      <label for="app-name" class="form-label"
+        data-init-visibility="compute?attribute:system-name/data-visibility==false" data-init>Application Name</label>
+      <!-- <p data-init-visibility="compute?total-children:system-name>=2" data-init hidden>null</p> -->
+      <!-- <p data-init-visibility="compute?classes:this==0" data-init hidden>null</p> -->
+      <input type="text" class="form-control" id="app-name" data-bind="name" placeholder="App name"
+        data-init-require="inherit?system-name/data-visibility"
+        data-init-data-unrequire="compute?attribute:system-name/data-visibility==false" data-init>
+      <div class="invalid-feedback" data-feedback="name">
+        Please enter a valid application name.
+      </div>
+    </div>
+
     <div data-bind="app" class="config">
       <h4>Window Configuration</h4>
       <div class="mb-3">
         <label for="title-input" class="form-label">Title</label>
         <input type="text" class="form-control" id="title-input" placeholder="App name" data-bind="app/title">
+        <div class="invalid-feedback" data-feedback="app/title">
+          Please enter a valid application title
+        </div>
+
       </div>
 
       <div class="mb-3">
         <label for="url-input" class="form-label">Application URL</label>
         <input type="text" class="form-control" id="url-input" placeholder="App URL" data-bind="app/url">
+        <div class="invalid-feedback" data-feedback="app/url">
+          Please enter a valid application URL
+        </div>
       </div>
 
-      <div class="input-group mb-3">
+      <div class="input-group mb-3 has-validation">
         <span class="input-group-text">App width and height</span>
-        <input type="number" aria-label="width" class="form-control" data-bind="app/width">
-        <input type="number" aria-label="height" class="form-control" data-bind="app/height">
+        <input type="number" aria-label="width" class="form-control" data-bind="app/width" id="width">
+        <input type="number" aria-label="height" class="form-control" data-bind="app/height" id="height">
+        <div class="invalid-feedback" data-feedback="app/width app/height">
+          Please enter a valid width:height value.
+        </div>
+
       </div>
 
       <div class="mb-3">
-        <label for="background-color-input" class="form-label">Application URL</label>
+        <label for="background-color-input" class="form-label">Application Background Color</label>
         <input type="text" class="form-control" id="background-color-input" placeholder="App Background color"
           data-bind="app/background_color">
+        <div class="invalid-feedback" data-feedback="app/background_color">
+          Please enter a valid background color.
+        </div>
+
       </div>
 
       <div class="form-check form-switch">
         <input class="form-check-input" type="checkbox" role="switch" id="resizable-input" data-bind="app/resizable">
         <label class="form-check-label" for="resizable-input">Resizable</label>
+
       </div>
       <div class="form-check form-switch">
         <input class="form-check-input" type="checkbox" role="switch" id="fullscreen-input" data-bind="app/fullscreen">
@@ -78,13 +109,18 @@
       <h4>Startup Configuration</h4>
       <div class="mb-3">
         <label for="gui-input" class="form-label">GUI Backend</label>
-        <input type="text" class="form-control" id="gui-input" placeholder="GUI Backend" data-bind="start/gui" disabled>
+        <input type="text" class="form-control" id="gui-input" placeholder="GUI Backend" data-bind="start/gui" disabled
+          data-unrequire>
       </div>
 
       <div class="mb-3">
         <label for="ua-input" class="form-label">User Agent</label>
         <input type="text" class="form-control" id="ua-input" placeholder="Webapp 0.1.0/PyWebview 5.3.2"
-          data-bind="start/user_agent">
+          data-bind="start/user_agent" data-unrequire>
+        <div class="invalid-feedback" data-feedback="start/user_agent">
+          Please enter a valid custom user agent
+        </div>
+
       </div>
 
       <div class="form-check form-switch">
@@ -124,7 +160,7 @@
     </div>
 
     <div class="d-grid gap-2 d-md-flex justify-content-md-end">
-      <button class="btn btn-primary" type="submit">Update</button>
+      <button class="btn $[submit_class]" type="submit">$[submit_text]</button>
     </div>
   </form>
 
