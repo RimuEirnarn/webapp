@@ -14,6 +14,10 @@ class API:
         """Shorter Version"""
         return "Webapp Manager"
 
+    def version(self):
+        """App version"""
+        return 'v0.0.1'
+
     webview = WebviewAPI()
     os = OSAPI()
     config = ConfigAPI()

@@ -4,6 +4,7 @@
  * 
  * @prop {function(): Promise<string>} app_name Application Name
  * @prop {function(): Promise<string>} short_name Application Short Name
+ * @prop {function(): Promise<string>} version Application version 
  * @prop {OSAPI} os OS API
  * @prop {WebviewAPI} webview Webview API
  * @prop {ConfigAPI} config Config Store
